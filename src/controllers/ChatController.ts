@@ -51,10 +51,11 @@ export default class ChatController {
             const chats: ChatModel[] = await ChatBll.getUserChats(ownerId);
 
             if (chats.length === 0) {
-                res.status(404).send({
+                res.status(200).send({
                     success: true,
                     code: res.statusCode,
-                    message: "Esse usuário não possui conversas"
+                    message: "Esse usuário não possui conversas",
+                    chats: []
                 });
                 return;
             }
@@ -67,12 +68,27 @@ export default class ChatController {
             return;
         } catch (error: any) {
             console.log(`Erro ao buscar conversas do usuário: ${error.message}`);
-            res.status(500).send({
-                success: false,
-                code: res.statusCode,
-                error: error.message,
-                chats: []
-            });
+
+            switch (error.message) {
+                case "ID do criador da sala é inválido":
+                    res.status(404).send({
+                        success: true,
+                        code: res.statusCode,
+                        message: error.message,
+                        chats: []
+                    });
+                    break;
+
+                default:
+                    res.status(500).send({
+                        success: false,
+                        code: res.statusCode,
+                        error: error.message,
+                        chats: []
+                    });
+                    break;
+            }
+
         }
     }
 
@@ -83,11 +99,11 @@ export default class ChatController {
             const chat: ChatModel | null = await ChatBll.getChat(id);
 
             if (!chat) {
-                res.status(404).send({
+                res.status(200).send({
                     success: true,
                     code: res.statusCode,
-                    chat: null,
-                    message: "Chat não encontrado"
+                    message: "Chat não encontrado",
+                    chat: null
                 })
                 return;
             }
@@ -100,12 +116,71 @@ export default class ChatController {
             return;
         } catch (error: any) {
             console.log(`Erro ao buscar chat: ${error.message}`);
-            res.status(500).send({
-                success: false,
+            switch (error.message) {
+                case "ID inválido do chat":
+                    res.status(404).send({
+                        success: true,
+                        code: res.statusCode,
+                        message: error.message,
+                        chat: null
+                    })
+                    break;
+
+                default:
+                    res.status(500).send({
+                        success: false,
+                        code: res.statusCode,
+                        error: error.message,
+                        chat: null
+                    });
+                    break;
+            }
+        }
+    }
+
+    static async getChatInfo(req: Request, res: Response) {
+        const id: string = req.params.id;
+
+        try {
+            const chat: ChatModel | null = await ChatBll.getChatInfo(id);
+
+            if (!chat) {
+                res.status(200).send({
+                    success: true,
+                    code: res.statusCode,
+                    message: "Chat não encontrado",
+                    chat: chat
+                })
+                return;
+            }
+
+            res.status(200).send({
+                success: true,
                 code: res.statusCode,
-                chat: null,
-                error: error.message
+                chat: chat
             });
+            return;
+        } catch (error: any) {
+            console.log(`Erro ao buscar chat: ${error.message}`);
+            switch (error.message) {
+                case "ID inválido do chat":
+                    res.status(404).send({
+                        success: true,
+                        code: res.statusCode,
+                        message: error.message,
+                        chat: null
+                    })
+                    break;
+
+                default:
+                    res.status(500).send({
+                        success: false,
+                        code: res.statusCode,
+                        error: error.message,
+                        chat: null
+                    });
+                    break;
+            }
         }
     }
 
@@ -120,16 +195,6 @@ export default class ChatController {
         try {
             const updatedChat: ChatModel | null = await ChatBll.updateChat(chat);
 
-            if (!updatedChat) {
-                res.status(404).send({
-                    success: false,
-                    code: res.statusCode,
-                    chat: updatedChat,
-                    message: "Chat não encontrado"
-                });
-                return;
-            }
-
             res.status(200).send({
                 success: true,
                 code: res.statusCode,
@@ -138,12 +203,28 @@ export default class ChatController {
             return;
         } catch (error: any) {
             console.log(`Erro ao atualizar chat: ${error.menssage}`);
-            res.status(500).send({
-                success: false,
-                code: res.statusCode,
-                error: error.message
-            });
-            return;
+
+            switch (error.message) {
+                case "Chat não encontrado":
+                case "ID da sala é inválido":
+                case "ID do criador da sala é inválido":
+                case "Data de criação inválida":
+                    res.status(404).send({
+                        success: false,
+                        code: res.statusCode,
+                        message: error.message,
+                        chat: null
+                    });
+                    break;
+
+                default:
+                    res.status(500).send({
+                        success: false,
+                        code: res.statusCode,
+                        error: error.message
+                    });
+                    break;
+            }
         }
     }
 

@@ -89,19 +89,54 @@ export default class ChatDal {
         }
     }
 
-    static async updateChat(chat: ChatModel): Promise<ChatModel | null> {
+    static async getChatInfo(id: string): Promise<ChatModel | null> {
+        try {
+            const docRef = doc(db, "chats", id);
+            const docSnapshot = await getDoc(docRef);
+            const chat = docSnapshot.data();
+
+            if (!chat) {
+                return null;
+            }
+
+            if (chat) {
+                const date = new Date(chat.creation.seconds * 1000);
+
+                return new ChatModel(
+                    docSnapshot.id,
+                    chat.ownerId,
+                    date,
+                    chat.guestId
+                );
+            }
+
+            return null;
+        } catch (error) {
+            console.error("Erro ao buscar dados do chat:", error);
+            return null;
+        }
+    }
+
+    static async updateChat(chat: ChatModel, chatInfo: ChatModel): Promise<ChatModel | null> {
         try {
             const docRef = doc(db, "chats", chat.getId);
 
+            const updatedChat = new ChatModel(
+                chat.getId,
+                chat.getOwnerId ? chat.getOwnerId : chatInfo.getOwnerId,
+                chat.getCreation ? chat.getCreation : chatInfo.getCreation,
+                chat.getGuestId ? chat.getGuestId : chatInfo.getGuestId,
+            );
+
             await updateDoc(docRef, {
-                ownerId: chat.getOwnerId,
-                creation: chat.getCreation,
-                guestId: chat.getGuestId,
+                ownerId: updatedChat.getOwnerId,
+                creation: updatedChat.getCreation,
+                guestId: updatedChat.getGuestId
             });
 
-            return chat;
+            return updatedChat;
         } catch (error: any) {
-            throw new Error(error);
+            throw new Error(error.message);
         }
     }
 
@@ -115,7 +150,7 @@ export default class ChatDal {
                 sentAt: message.getSentAt
             });
         } catch (error: any) {
-            throw new Error(error);
+            throw new Error(error.message);
         }
     }
 }
