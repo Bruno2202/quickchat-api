@@ -8,21 +8,23 @@ export function AuthMiddleware(req: Request, res: Response, next: NextFunction) 
         const authorization: string | undefined = req.headers.authorization;
 
         if (!authorization) {
-            return res.status(401).json({
+            res.status(401).json({
                 success: false,
                 code: 401,
                 message: "Token de autenticação não informado",
             });
+            return;
         }
 
         const token = authorization.split(" ")[1];
 
         if (!token) {
-            return res.status(401).json({
+            res.status(401).json({
                 success: false,
                 code: 401,
                 message: "Token inválido",
             });
+            return;
         }
 
         jwt.verify(token, JWT_SECRET);
@@ -31,10 +33,11 @@ export function AuthMiddleware(req: Request, res: Response, next: NextFunction) 
     } catch (error: any) {
         console.log(`Não foi possível autenticar sessão: ${error.message}`);
 
-        return res.status(401).json({
+        res.status(401).json({
             success: false,
             code: 401,
             message: "Token inválido ou expirado",
         });
+        return ;
     }
 }
