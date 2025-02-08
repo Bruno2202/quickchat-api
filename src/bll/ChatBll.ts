@@ -26,27 +26,49 @@ export default class ChatBll {
 
     static async getUserChats(ownerId: string): Promise<ChatModel[]> {
         try {
+            if (!ownerId) {
+                throw new Error('ID do criador da sala é inválido');
+            }
+
             return await ChatDal.getUserChats(ownerId);
-        } catch (error) {
-            throw Error;
+        } catch (error: any) {
+            throw new Error(error.message);
         }
     }
 
     static async getChat(id: string): Promise<ChatModel | null> {
         try {
+            if (!id) {
+                throw new Error('ID inválido do chat');
+            }
+
             return await ChatDal.getChat(id);
-        } catch (error) {
-            throw Error;
+        } catch (error: any) {
+            throw new Error(error.message);
+        }
+    }
+
+    static async getChatInfo(id: string): Promise<ChatModel | null> {
+        try {
+            if (!id) {
+                throw new Error('ID inválido do chat');
+            }
+
+            return await ChatDal.getChatInfo(id);
+        } catch (error: any) {
+            throw new Error(error.message);
         }
     }
 
     static async updateChat(chat: ChatModel): Promise<ChatModel | null> {
         try {
-            if (!await this.getChat(chat.getId)) {
-                return null;
+            const chatInfo = await this.getChatInfo(chat.getId);
+
+            if (!chatInfo) {
+                throw new Error('Chat não encontrado');
             }
 
-            return await ChatDal.updateChat(chat);
+            return await ChatDal.updateChat(chat, chatInfo);
         } catch (error: any) {
             throw new Error(error.message);
         }
