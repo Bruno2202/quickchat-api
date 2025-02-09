@@ -12,6 +12,13 @@ export default class ChatDal {
                 guestId: chat.getGuestId ? chat.getGuestId : ""
             });
 
+            const collectionRef = collection(db, `chats/${chat.getId}/messages`);
+            const docRef = doc(collectionRef, "alert");
+            await setDoc(docRef, {
+                message: "Lembre-se de manter o respeito e a educação durante a conversa. Evite compartilhar informações pessoais e seja cordial com todos.",
+                sentAt: chat.getCreation
+            });
+
             console.log(`Chat criado por ${chat.getOwnerId}`);
             return true;
         } catch (error) {
