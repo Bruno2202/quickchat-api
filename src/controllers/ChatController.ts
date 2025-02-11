@@ -8,8 +8,8 @@ export default class ChatController {
         const chat = new ChatModel(
             req.body.chat.id,
             req.body.chat.ownerId,
-            new Date(req.body.chat.creation),
-            req.body.chat.guestId
+            req.body.chat.ownerUsername,
+            new Date(req.body.chat.creation)
         )
 
         try {
@@ -188,8 +188,10 @@ export default class ChatController {
         const chat = new ChatModel(
             req.body.id,
             req.body.ownerId,
+            req.body.ownerUsername,
             req.body.creation,
-            req.body.guestId
+            req.body.guestId,
+            req.body.guestUsername
         )
 
         try {
@@ -232,13 +234,14 @@ export default class ChatController {
         const message = new MessageModel(
             req.body.message.message,
             req.body.message.senderId,
+            req.body.message.senderUsername,
             new Date(req.body.message.sentAt)
         )
 
-        const id: string = req.body.id
+        const chatId: string = req.body.id
 
         try {
-            await ChatBll.saveMessage(message, id);
+            await ChatBll.saveMessage(message, chatId);
 
             res.status(204).send({
                 // success: true,
@@ -251,6 +254,7 @@ export default class ChatController {
                 case "Chat não encontrado":
                 case "Mensagem inválida":
                 case "ID do remente é inválido":
+                case "Nome do remente é inválido":
                 case "Data de envio inválida":
                     res.status(404).send({
                         success: false,

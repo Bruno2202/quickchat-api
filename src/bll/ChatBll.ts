@@ -4,11 +4,16 @@ import MessageModel from "../models/MessageModel";
 
 export default class ChatBll {
     static async validateChat(chat: ChatModel) {
+        console.log(chat)
+
         if (!chat.getId) {
             throw new Error('ID da sala é inválido');
         }
         if (!chat.getOwnerId) {
             throw new Error('ID do criador da sala é inválido');
+        }
+        if (!chat.getOwnerUsername || chat.getOwnerUsername.length < 1 || chat.getOwnerUsername.length > 15) {
+            throw new Error('Nome do criador da sala é inválido');
         }
         if (isNaN(chat.getCreation.getTime())) {
             throw new Error('Data de criação inválida');
@@ -78,6 +83,7 @@ export default class ChatBll {
         const messageRequest = new MessageModel(
             message.message,
             message.senderId,
+            message.senderUsername,
             new Date(message.sentAt)
         );
 
@@ -91,13 +97,17 @@ export default class ChatBll {
             if (!messageRequest.getSenderId) {
                 throw new Error("ID do remente é inválido");
             }
+            if (!messageRequest.getSenderUsername || messageRequest.getSenderUsername.length < 1 || messageRequest.getSenderUsername.length > 15) {
+                throw new Error("Nome do remente é inválido");
+            }
             if (isNaN(messageRequest.getSentAt.getTime())) {
                 throw new Error("Data de envio inválida");
             }
 
             await ChatDal.saveMessage(messageRequest, chatId);
         } catch (error: any) {
-            throw new Error(error.message)
+            console.log(`Não foi possível salvar mensagem: ${error.message}`)
+            // throw new Error(error.message)
         }
     }
 }

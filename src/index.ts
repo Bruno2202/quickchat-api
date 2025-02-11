@@ -75,7 +75,7 @@ io.on('connect', (socket: any) => {
         }
     });
 
-    
+
     socket.on('disconnect', () => {
         console.log(`Usuário desconectado: ${socket.id}`);
     });
