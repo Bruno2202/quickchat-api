@@ -84,3 +84,9 @@ io.on('connect', (socket: any) => {
 server.listen(3000, () => {
     console.log('Server running at http://localhost:3000 🚀');
 });
+
+setInterval(async () => {
+    await fetch(`http://localhost:3000/status`, {
+        method: 'GET',
+    });
+}, 10000);
