@@ -22,6 +22,8 @@ app.use('/', routes);
 
 const io = new Server(server, {
     cors: corsOptions,
+    pingInterval: 25000,
+    pingTimeout: 5000, 
 });
 
 interface MessageRequest {
