@@ -1,6 +1,6 @@
 # QuickChat API 💬
 
-Este projeto é o backend [QuickChat](https://github.com/Bruno2202/quickchat), projetado para fornecer funcionalidades de comunicação em tempo real e gerenciamento de conversas. Ele permite a troca de mensagens, criação de salas de chat e autenticação de usuários.
+Este projeto é o backend do [QuickChat](https://github.com/Bruno2202/quickchat), projetado para fornecer funcionalidades de comunicação em tempo real e gerenciamento de conversas. Ele permite a troca de mensagens, criação de salas de chat e autenticação de usuários.
 
 ## Descrição Geral
 
